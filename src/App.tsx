@@ -10,8 +10,12 @@ import { updateSession } from "./store/system/actions";
 import { ChatState } from "./store/chat/types";
 import { sendMessage } from "./store/chat/actions";
 
+import { KibanaState } from "./store/kibana/types";
+import { thunkFetchSavedObjects } from "./store/kibana/actions";
+
 import ChatHistory from "./ChatHistory";
 import ChatInterface from "./ChatInterface";
+import IndexPatternList from "./IndexPatternList";
 
 import { thunkSendMessage } from "./thunks";
 
@@ -20,7 +24,9 @@ interface AppProps {
   updateSession: typeof updateSession;
   chat: ChatState;
   system: SystemState;
+  kibana: KibanaState;
   thunkSendMessage: any;
+  thunkFetchSavedObjects: any;
 }
 
 export type UpdateMessageParam = React.SyntheticEvent<{ value: string }>;
@@ -44,6 +50,7 @@ class App extends React.Component<AppProps> {
     });
 
     this.props.thunkSendMessage("This message was sent by a thunk!");
+    this.props.thunkFetchSavedObjects();
   }
 
   updateMessage = (event: UpdateMessageParam) => {
@@ -69,6 +76,7 @@ class App extends React.Component<AppProps> {
           updateMessage={this.updateMessage}
           sendMessage={this.sendMessage}
         />
+        <IndexPatternList indexPatterns={this.props.kibana.indexPatterns} />
       </div>
     );
   }
@@ -76,10 +84,11 @@ class App extends React.Component<AppProps> {
 
 const mapStateToProps = (state: AppState) => ({
   system: state.system,
-  chat: state.chat
+  chat: state.chat,
+  kibana: state.kibana
 });
 
 export default connect(
   mapStateToProps,
-  { sendMessage, updateSession, thunkSendMessage }
+  { sendMessage, updateSession, thunkSendMessage, thunkFetchSavedObjects }
 )(App);
